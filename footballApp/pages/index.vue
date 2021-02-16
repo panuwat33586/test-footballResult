@@ -12,12 +12,13 @@
           <th scope="col">เสีย</th>
           <th scope="col">ต่าง</th>
           <th scope="col">score</th>
+          <th scope="col">5 เกมล่าสุด</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(team, $teamIndex) in computeEachTeamData" :key="$teamIndex">
           <td>
-            {{ team.name }}
+            {{$teamIndex+1}} {{ team.name }}
           </td>
           <td>
             {{ team.match }}
@@ -42,6 +43,9 @@
           </td>
           <td>
             {{ team.score }}
+          </td>
+           <td>
+            {{ team.records }}
           </td>
         </tr>
       </tbody>
@@ -70,6 +74,8 @@ export default {
           score: 0,
           gain: 0,
           lose: 0,
+          recordIndex:0,
+          records:[]
         };
         if (!acc[match.team1]) {
           acc[match.team1] = {
@@ -89,7 +95,6 @@ export default {
         this.computeMatchScore(acc, match);
         return acc;
       }, {});
-      console.log(Object.values(computedData))
       const teamData=Object.values(computedData).sort((a,b)=>a.score>b.score?-1:1)
       return teamData
     },
@@ -117,24 +122,37 @@ export default {
       acc[match.team2].gain += match.score.ft[1];
       acc[match.team2].lose += match.score.ft[0];
     },
-    computeMatchScore(acc, match) {
+    computeMatchScore(acc,match) {
       if (match.score.ft[0] > match.score.ft[1]) {
         acc[match.team1].w += 1;
         acc[match.team1].score += 3;
         acc[match.team2].l += 1;
+        this.writeRecord(acc[match.team1],'win')
+        this.writeRecord(acc[match.team2],'lose')
       }
       if (match.score.ft[0] == match.score.ft[1]) {
         acc[match.team1].d += 1;
         acc[match.team2].d += 1;
         acc[match.team1].score += 1;
         acc[match.team2].score += 1;
+       this.writeRecord(acc[match.team1],'draw')
+        this.writeRecord(acc[match.team2],'draw')
       }
       if (match.score.ft[0] < match.score.ft[1]) {
         acc[match.team1].l += 1;
         acc[match.team2].w += 1;
         acc[match.team2].score += 3;
+        this.writeRecord(acc[match.team1],'lose')
+        this.writeRecord(acc[match.team2],'win')
       }
     },
+    writeRecord(data,result){
+      if(data.recordIndex==5){
+        data.recordIndex=0
+      }
+      data.records[data.recordIndex]=result
+      data.recordIndex+=1
+    }
   },
 };
 </script>
