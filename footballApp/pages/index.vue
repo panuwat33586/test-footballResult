@@ -90,7 +90,6 @@ export default {
           score: 0,
           gain: 0,
           lose: 0,
-          recordIndex:0,
           records:[]
         };
         if (!acc[match.team1]) {
@@ -121,10 +120,12 @@ export default {
         const { data } = await this.$axios.get(
           "https://raw.githubusercontent.com/openfootball/football.json/master/2014-15/en.1.json"
         );
-        this.footballMatchDatas = data.rounds.reduce((acc, round) => {
+        const reduceData = data.rounds.reduce((acc, round) => {
         acc = [...acc, ...round.matches];
         return acc;
       }, []);
+        const sortData=reduceData.sort((a,b)=>a.date>b.date?-1:1)
+        this.footballMatchDatas=sortData
       } catch (error) {
         console.log(error);
       }
@@ -145,16 +146,14 @@ export default {
         acc[match.team2].l += 1;
         this.writeRecord(acc[match.team1],'win')
         this.writeRecord(acc[match.team2],'lose')
-      }
-      if (match.score.ft[0] == match.score.ft[1]) {
+      }else if(match.score.ft[0] == match.score.ft[1]) {
         acc[match.team1].d += 1;
         acc[match.team2].d += 1;
         acc[match.team1].score += 1;
         acc[match.team2].score += 1;
-       this.writeRecord(acc[match.team1],'draw')
+        this.writeRecord(acc[match.team1],'draw')
         this.writeRecord(acc[match.team2],'draw')
-      }
-      if (match.score.ft[0] < match.score.ft[1]) {
+      }else{
         acc[match.team1].l += 1;
         acc[match.team2].w += 1;
         acc[match.team2].score += 3;
@@ -163,11 +162,11 @@ export default {
       }
     },
     writeRecord(data,result){
-      if(data.recordIndex==5){
-        data.recordIndex=0
+      if(data.records.length<5){
+      let index=data.records.length
+      console.log(data.name,index,result)
+      data.records[index]=result
       }
-      data.records[data.recordIndex]=result
-      data.recordIndex+=1
     }
   },
 };
