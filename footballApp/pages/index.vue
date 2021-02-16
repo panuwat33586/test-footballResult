@@ -1,104 +1,140 @@
 <template>
   <div class="container">
     <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Team</th>
-      <th scope="col">Match</th>
-      <th scope="col">W</th>
-      <th scope="col">D</th>
-      <th scope="col">L</th>
-      <th scope="col">score</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr
-    v-for="(team,$teamIndex) in computeEachTeamData"
-    :key=$teamIndex
-    >
-      <td>
-        {{team.name}}
-      </td>
-      <td>
-        {{team.match}}
-      </td>
-      <td>
-        {{team.w}}
-      </td>
-      <td>
-        {{team.d}}
-      </td>
-      <td>
-        {{team.l}}
-      </td>
-      <td>
-        {{team.score}}
-      </td>
-    </tr>
-  </tbody>
-</table>
-    
+      <thead>
+        <tr>
+          <th scope="col">Team</th>
+          <th scope="col">Match</th>
+          <th scope="col">W</th>
+          <th scope="col">D</th>
+          <th scope="col">L</th>
+          <th scope="col">ได้</th>
+          <th scope="col">เสีย</th>
+          <th scope="col">ต่าง</th>
+          <th scope="col">score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(team, $teamIndex) in computeEachTeamData" :key="$teamIndex">
+          <td>
+            {{ team.name }}
+          </td>
+          <td>
+            {{ team.match }}
+          </td>
+          <td>
+            {{ team.w }}
+          </td>
+          <td>
+            {{ team.d }}
+          </td>
+          <td>
+            {{ team.l }}
+          </td>
+          <td>
+            {{ team.gain }}
+          </td>
+          <td>
+            {{ team.lose }}
+          </td>
+          <td>
+            {{ calDiff(team) }}
+          </td>
+          <td>
+            {{ team.score }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script>
 export default {
-  data(){
+  data() {
     return {
-      footballMatchDatas:[]
-    }
+      footballMatchDatas: [],
+    };
   },
-  created(){
-     this.fetchData()
+  created() {
+    this.fetchData();
   },
-  computed:{
-      computeEachTeamData(){
-        const data=this.footballMatchDatas.reduce((acc,round)=>{
-          acc=[...acc,...round.matches]
-          return acc
-        },[])
-           return data.reduce((acc,match)=>{
-            if(!acc[match.team1]){
-              acc[match.team1]={match:0,name:match.team1,w:0,d:0,l:0,score:0}
-            }
-            if(!acc[match.team2]){
-              acc[match.team2]={match:0,name:match.team2,w:0,d:0,l:0,score:0}
-            }
-            acc[match.team1].match+=1
-            acc[match.team2].match+=1
-            if(match.score.ft[0]>match.score.ft[1]){
-              acc[match.team1].w+=1
-              acc[match.team1].score+=3
-              acc[match.team2].l+=1
-            }
-            if(match.score.ft[0]==match.score.ft[1]){
-              acc[match.team1].d+=1
-              acc[match.team2].d+=1
-              acc[match.team1].score+=1
-              acc[match.team2].score+=1
-            }
-            if(match.score.ft[0]<match.score.ft[1]){
-              acc[match.team1].l+=1
-              acc[match.team2].w+=1
-              acc[match.team2].score+=3
-            }
-            return acc
-          },{})
-      }
+  computed: {
+    computeEachTeamData() {
+      const data = this.footballMatchDatas.reduce((acc, round) => {
+        acc = [...acc, ...round.matches];
+        return acc;
+      }, []);
+      return data.reduce((acc, match) => {
+        let initialForm = {
+          match: 0,
+          w: 0,
+          d: 0,
+          l: 0,
+          score: 0,
+          gain: 0,
+          lose: 0,
+        };
+        if (!acc[match.team1]) {
+          acc[match.team1] = {
+            ...initialForm,
+            name: match.team1,
+          };
+        }
+        if (!acc[match.team2]) {
+          acc[match.team2] = {
+            ...initialForm,
+            name: match.team2
+          };
+        }
+        acc[match.team1].match += 1;
+        acc[match.team2].match += 1;
+        this.computeGainLose(acc, match);
+        this.computeMatchScore(acc, match);
+        return acc;
+      }, {});
+    },
   },
   methods: {
-     async fetchData(){
-       try{
-         const {data}=await this.$axios.get('https://raw.githubusercontent.com/openfootball/football.json/master/2014-15/en.1.json')     
-        this.footballMatchDatas=data.rounds
-       }catch(error){
-         console.log(error)
-       }
-     },
+    async fetchData() {
+      try {
+        const { data } = await this.$axios.get(
+          "https://raw.githubusercontent.com/openfootball/football.json/master/2014-15/en.1.json"
+        );
+        this.footballMatchDatas = data.rounds;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    calDiff(data) {
+      return data.gain - data.lose;
+    },
+    computeGainLose(acc, match) {
+      acc[match.team1].gain += match.score.ft[0];
+      acc[match.team1].lose += match.score.ft[1];
+      acc[match.team2].gain += match.score.ft[1];
+      acc[match.team2].lose += match.score.ft[0];
+    },
+    computeMatchScore(acc, match) {
+      if (match.score.ft[0] > match.score.ft[1]) {
+        acc[match.team1].w += 1;
+        acc[match.team1].score += 3;
+        acc[match.team2].l += 1;
+      }
+      if (match.score.ft[0] == match.score.ft[1]) {
+        acc[match.team1].d += 1;
+        acc[match.team2].d += 1;
+        acc[match.team1].score += 1;
+        acc[match.team2].score += 1;
+      }
+      if (match.score.ft[0] < match.score.ft[1]) {
+        acc[match.team1].l += 1;
+        acc[match.team2].w += 1;
+        acc[match.team2].score += 3;
+      }
+    },
   },
-}
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
