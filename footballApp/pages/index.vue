@@ -1,73 +1,102 @@
 <template>
   <div class="container">
-    <div>
-      <Logo />
-      <h1 class="title">
-        footballApp
-      </h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
-    </div>
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Team</th>
+      <th scope="col">W</th>
+      <th scope="col">D</th>
+      <th scope="col">L</th>
+      <th scope="col">score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr
+    v-for="(team,$teamIndex) in computeEachTeamData"
+    :key=$teamIndex
+    >
+      <td>
+        {{team.name}}
+      </td>
+      <td>
+        {{team.w}}
+      </td>
+      <td>
+        {{team.d}}
+      </td>
+      <td>
+        {{team.l}}
+      </td>
+      <td>
+        {{team.score}}
+      </td>
+    </tr>
+  </tbody>
+</table>
+    
   </div>
 </template>
 
 <script>
-export default {}
+export default {
+  data(){
+    return {
+      footballMatchDatas:[]
+    }
+  },
+  created(){
+     this.fetchData()
+  },
+  computed:{
+      fiteredMatch(){
+        const start=this.footballMatchDatas.length-5
+        return this.footballMatchDatas.slice(start,this.footballMatchDatas.length)
+      },
+      computeEachTeamData(){
+        const data=this.fiteredMatch.reduce((acc,round)=>{
+          acc=[...acc,...round.matches]
+          return acc
+        },[])
+           return data.reduce((acc,match)=>{
+            if(!acc[match.team1]){
+              acc[match.team1]={name:match.team1,w:0,d:0,l:0,score:0}
+            }
+            if(!acc[match.team2]){
+              acc[match.team2]={name:match.team2,w:0,d:0,l:0,score:0}
+            }
+            if(match.score.ft[0]>match.score.ft[1]){
+              acc[match.team1].w+=1
+              acc[match.team1].score+=3
+              acc[match.team2].l+=1
+            }
+            if(match.score.ft[0]==match.score.ft[1]){
+              acc[match.team1].d+=1
+              acc[match.team2].d+=1
+              acc[match.team1].score+=1
+              acc[match.team2].score+=1
+            }
+            if(match.score.ft[0]<match.score.ft[1]){
+              acc[match.team1].l+=1
+              acc[match.team2].w+=1
+              acc[match.team2].score+=3
+            }
+            return acc
+          },{})
+      }
+  },
+  methods: {
+     async fetchData(){
+       try{
+         const {data}=await this.$axios.get('https://raw.githubusercontent.com/openfootball/football.json/master/2014-15/en.1.json')     
+        this.footballMatchDatas=data.rounds
+       }catch(error){
+         console.log(error)
+       }
+     },
+  },
+}
 </script>
 
 <style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
 
-.title {
-  font-family:
-    'Quicksand',
-    'Source Sans Pro',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
 </style>
