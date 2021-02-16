@@ -45,7 +45,23 @@
             {{ team.score }}
           </td>
            <td>
-            {{ team.records }}
+             <template  v-for="(record,$recordIndex) in team.records">
+              <i 
+             :key="'win'+$recordIndex"
+             v-if="record=='win'"
+             class="bi bi-check"
+             />
+              <i 
+             :key="'lose'+$recordIndex"
+             v-if="record=='lose'"
+             class="bi bi-x"
+             />
+            <i 
+             :key="'draw'+$recordIndex"
+             v-if="record=='draw'"
+             class="bi bi-dash"
+             />
+             </template>
           </td>
         </tr>
       </tbody>
