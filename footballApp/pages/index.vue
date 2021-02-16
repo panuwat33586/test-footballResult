@@ -4,6 +4,7 @@
   <thead>
     <tr>
       <th scope="col">Team</th>
+      <th scope="col">Match</th>
       <th scope="col">W</th>
       <th scope="col">D</th>
       <th scope="col">L</th>
@@ -17,6 +18,9 @@
     >
       <td>
         {{team.name}}
+      </td>
+      <td>
+        {{team.match}}
       </td>
       <td>
         {{team.w}}
@@ -59,11 +63,13 @@ export default {
         },[])
            return data.reduce((acc,match)=>{
             if(!acc[match.team1]){
-              acc[match.team1]={name:match.team1,w:0,d:0,l:0,score:0}
+              acc[match.team1]={match:0,name:match.team1,w:0,d:0,l:0,score:0}
             }
             if(!acc[match.team2]){
-              acc[match.team2]={name:match.team2,w:0,d:0,l:0,score:0}
+              acc[match.team2]={match:0,name:match.team2,w:0,d:0,l:0,score:0}
             }
+            acc[match.team1].match+=1
+            acc[match.team2].match+=1
             if(match.score.ft[0]>match.score.ft[1]){
               acc[match.team1].w+=1
               acc[match.team1].score+=3
