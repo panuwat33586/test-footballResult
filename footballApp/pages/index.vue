@@ -52,12 +52,8 @@ export default {
      this.fetchData()
   },
   computed:{
-      fiteredMatch(){
-        const start=this.footballMatchDatas.length-5
-        return this.footballMatchDatas.slice(start,this.footballMatchDatas.length)
-      },
       computeEachTeamData(){
-        const data=this.fiteredMatch.reduce((acc,round)=>{
+        const data=this.footballMatchDatas.reduce((acc,round)=>{
           acc=[...acc,...round.matches]
           return acc
         },[])
