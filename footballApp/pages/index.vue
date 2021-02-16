@@ -61,11 +61,7 @@ export default {
   },
   computed: {
     computeEachTeamData() {
-      const data = this.footballMatchDatas.reduce((acc, round) => {
-        acc = [...acc, ...round.matches];
-        return acc;
-      }, []);
-      const computedData= data.reduce((acc, match) => {
+      const computedData= this.footballMatchDatas.reduce((acc, match) => {
         let initialForm = {
           match: 0,
           w: 0,
@@ -104,7 +100,10 @@ export default {
         const { data } = await this.$axios.get(
           "https://raw.githubusercontent.com/openfootball/football.json/master/2014-15/en.1.json"
         );
-        this.footballMatchDatas = data.rounds;
+        this.footballMatchDatas = data.rounds.reduce((acc, round) => {
+        acc = [...acc, ...round.matches];
+        return acc;
+      }, []);
       } catch (error) {
         console.log(error);
       }
