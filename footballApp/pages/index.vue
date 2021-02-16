@@ -65,7 +65,7 @@ export default {
         acc = [...acc, ...round.matches];
         return acc;
       }, []);
-      return data.reduce((acc, match) => {
+      const computedData= data.reduce((acc, match) => {
         let initialForm = {
           match: 0,
           w: 0,
@@ -93,6 +93,9 @@ export default {
         this.computeMatchScore(acc, match);
         return acc;
       }, {});
+      console.log(Object.values(computedData))
+      const teamData=Object.values(computedData).sort((a,b)=>a.score>b.score?-1:1)
+      return teamData
     },
   },
   methods: {
