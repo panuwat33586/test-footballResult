@@ -34,20 +34,23 @@ export default class Team {
         }
     }
 
-    setScoreResult(result){
+    setScoreResult(matchData,team,result){
         switch(result){
             case 'win':
                 this.w+=1
                 this.score+=3
+                this.computeGainlose(matchData,team)
                 this.setRecords('win')
                 break;
             case 'draw':
                 this.d+=1
                 this.score+=1
+                this.computeGainlose(matchData,team)
                 this.setRecords('draw')
                 break;
             case 'lose':
                 this.l+=1
+                this.computeGainlose(matchData,team)
                 this.setRecords('lose')
                 break;
             default:

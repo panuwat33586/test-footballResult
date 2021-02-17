@@ -91,9 +91,7 @@ export default {
         }
         acc[match.team1].addMatch()
         acc[match.team2].addMatch()
-        acc[match.team1].computeGainlose(match,'team1')
-        acc[match.team2].computeGainlose(match,'team2')
-        this.computeMatchScore(acc[match.team1], acc[match.team2],match.score.ft[0],match.score.ft[1]);
+        this.computeMatchScore(match,acc[match.team1], acc[match.team2],match.score.ft[0],match.score.ft[1]);
         return acc;
       }, {});
       const teamData=Object.values(computedData).sort((a,b)=>a.score>b.score?-1:1)
@@ -119,16 +117,16 @@ export default {
     calDiff(data) {
       return data.gain - data.lose;
     },
-    computeMatchScore(team1, team2,scoreTeam1,scoreTeam2) {
+    computeMatchScore(match,team1, team2,scoreTeam1,scoreTeam2) {
       if (scoreTeam1 > scoreTeam2) {
-        team1.setScoreResult('win')
-        team2.setScoreResult('lose')
+        team1.setScoreResult(match,'team1','win')
+        team2.setScoreResult(match,'team2','lose')
       }else if(scoreTeam1 == scoreTeam2) {
-        team1.setScoreResult('draw')
-        team2.setScoreResult('draw')
+        team1.setScoreResult(match,'team1','draw')
+        team2.setScoreResult(match,'team2','draw')
       }else{
-        team1.setScoreResult('lose')
-        team2.setScoreResult('win')
+        team1.setScoreResult(match,'team1','lose')
+        team2.setScoreResult(match,'team2','win')
       }
     },
   },
