@@ -91,8 +91,8 @@ export default {
         }
         acc[match.team1].match += 1;
         acc[match.team2].match += 1;
-        this.computeGainLose(acc, match);
-        this.computeMatchScore(acc, match);
+        this.computeGainLose(acc[match.team1], acc[match.team2],match.score.ft[0],match.score.ft[1]);
+        this.computeMatchScore(acc[match.team1], acc[match.team2],match.score.ft[0],match.score.ft[1]);
         return acc;
       }, {});
       const teamData=Object.values(computedData).sort((a,b)=>a.score>b.score?-1:1)
@@ -118,39 +118,38 @@ export default {
     calDiff(data) {
       return data.gain - data.lose;
     },
-    computeGainLose(acc, match) {
-      acc[match.team1].gain += match.score.ft[0];
-      acc[match.team1].lose += match.score.ft[1];
-      acc[match.team2].gain += match.score.ft[1];
-      acc[match.team2].lose += match.score.ft[0];
+    computeGainLose(team1, team2,scoreTeam1,scoreTeam2) {
+      team1.gain += scoreTeam1;
+      team1.lose += scoreTeam2;
+      team2.gain += scoreTeam2;
+      team2.lose += scoreTeam1;
     },
-    computeMatchScore(acc,match) {
-      if (match.score.ft[0] > match.score.ft[1]) {
-        acc[match.team1].w += 1;
-        acc[match.team1].score += 3;
-        acc[match.team2].l += 1;
-        this.writeRecord(acc[match.team1],'win')
-        this.writeRecord(acc[match.team2],'lose')
-      }else if(match.score.ft[0] == match.score.ft[1]) {
-        acc[match.team1].d += 1;
-        acc[match.team2].d += 1;
-        acc[match.team1].score += 1;
-        acc[match.team2].score += 1;
-        this.writeRecord(acc[match.team1],'draw')
-        this.writeRecord(acc[match.team2],'draw')
+    computeMatchScore(team1, team2,scoreTeam1,scoreTeam2) {
+      if (scoreTeam1 > scoreTeam2) {
+        team1.w += 1;
+        team1.score += 3;
+        team2.l += 1;
+        this.writeRecord(team1.records,'win')
+        this.writeRecord(team2.records,'lose')
+      }else if(scoreTeam1 == scoreTeam2) {
+        team1.d += 1;
+        team2.d += 1;
+        team1.score += 1;
+        team2.score += 1;
+        this.writeRecord(team1.records,'draw')
+        this.writeRecord(team2.records,'draw')
       }else{
-        acc[match.team1].l += 1;
-        acc[match.team2].w += 1;
-        acc[match.team2].score += 3;
-        this.writeRecord(acc[match.team1],'lose')
-        this.writeRecord(acc[match.team2],'win')
+        team1.l += 1;
+        team2.w += 1;
+        team2.score += 3;
+        this.writeRecord(team1.records,'lose')
+        this.writeRecord(team2.records,'win')
       }
     },
-    writeRecord(data,result){
-      if(data.records.length<5){
-      let index=data.records.length
-      console.log(data.name,index,result)
-      data.records[index]=result
+    writeRecord(teamRecord,result){
+      if(teamRecord.length<5){
+      let index=teamRecord.length
+      teamRecord[index]=result
       }
     }
   },
