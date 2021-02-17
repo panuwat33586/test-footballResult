@@ -70,6 +70,7 @@
 </template>
 
 <script>
+import Team from '../classes/team'
 export default {
   data() {
     return {
@@ -82,27 +83,11 @@ export default {
   computed: {
     computeEachTeamData() {
       const computedData= this.footballMatchDatas.reduce((acc, match) => {
-        let initialForm = {
-          match: 0,
-          w: 0,
-          d: 0,
-          l: 0,
-          score: 0,
-          gain: 0,
-          lose: 0,
-          records:[]
-        };
         if (!acc[match.team1]) {
-          acc[match.team1] = {
-            ...initialForm,
-            name: match.team1,
-          };
+          acc[match.team1] = new Team(match.team1)
         }
         if (!acc[match.team2]) {
-          acc[match.team2] = {
-            ...initialForm,
-            name: match.team2
-          };
+          acc[match.team2] = new Team (match.team2)
         }
         acc[match.team1].match += 1;
         acc[match.team2].match += 1;
