@@ -19,21 +19,6 @@ export default class Team {
         this.match+=1
     }
 
-    computeGainlose(matchData,team){
-        switch(team){
-            case 'team1':
-                this.gain+=matchData.score.ft[0]
-                this.lose+=matchData.score.ft[1]
-                break;
-            case 'team2':
-                this.gain+=matchData.score.ft[1]
-                this.lose+=matchData.score.ft[0]
-                break;
-            default:
-                break;
-        }
-    }
-
     setScoreResult(matchData,team,result){
         switch(result){
             case 'win':
@@ -57,7 +42,21 @@ export default class Team {
                 break;
         }
     }
-
+    computeGainlose(matchData,team){
+        switch(team){
+            case 'team1':
+                this.gain+=matchData.score.ft[0]
+                this.lose+=matchData.score.ft[1]
+                break;
+            case 'team2':
+                this.gain+=matchData.score.ft[1]
+                this.lose+=matchData.score.ft[0]
+                break;
+            default:
+                break;
+        }
+    }
+    
     setRecords(result){
         if(this.records.length<5){
             this.records[this.records.length]=result
