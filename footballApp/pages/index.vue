@@ -89,9 +89,10 @@ export default {
         if (!acc[match.team2]) {
           acc[match.team2] = new Team (match.team2)
         }
-        acc[match.team1].match += 1;
-        acc[match.team2].match += 1;
-        this.computeGainLose(acc[match.team1], acc[match.team2],match.score.ft[0],match.score.ft[1]);
+        acc[match.team1].addMatch()
+        acc[match.team2].addMatch()
+        acc[match.team1].computeGainlose(match,'team1')
+        acc[match.team2].computeGainlose(match,'team2')
         this.computeMatchScore(acc[match.team1], acc[match.team2],match.score.ft[0],match.score.ft[1]);
         return acc;
       }, {});
@@ -118,40 +119,18 @@ export default {
     calDiff(data) {
       return data.gain - data.lose;
     },
-    computeGainLose(team1, team2,scoreTeam1,scoreTeam2) {
-      team1.gain += scoreTeam1;
-      team1.lose += scoreTeam2;
-      team2.gain += scoreTeam2;
-      team2.lose += scoreTeam1;
-    },
     computeMatchScore(team1, team2,scoreTeam1,scoreTeam2) {
       if (scoreTeam1 > scoreTeam2) {
-        team1.w += 1;
-        team1.score += 3;
-        team2.l += 1;
-        this.writeRecord(team1.records,'win')
-        this.writeRecord(team2.records,'lose')
+        team1.setScoreResult('win')
+        team2.setScoreResult('lose')
       }else if(scoreTeam1 == scoreTeam2) {
-        team1.d += 1;
-        team2.d += 1;
-        team1.score += 1;
-        team2.score += 1;
-        this.writeRecord(team1.records,'draw')
-        this.writeRecord(team2.records,'draw')
+        team1.setScoreResult('draw')
+        team2.setScoreResult('draw')
       }else{
-        team1.l += 1;
-        team2.w += 1;
-        team2.score += 3;
-        this.writeRecord(team1.records,'lose')
-        this.writeRecord(team2.records,'win')
+        team1.setScoreResult('lose')
+        team2.setScoreResult('win')
       }
     },
-    writeRecord(teamRecord,result){
-      if(teamRecord.length<5){
-      let index=teamRecord.length
-      teamRecord[index]=result
-      }
-    }
   },
 };
 </script>

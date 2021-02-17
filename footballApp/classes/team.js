@@ -14,4 +14,51 @@ export default class Team {
     constructor(teamName){
         this.name=teamName
     }
+
+    addMatch(){
+        this.match+=1
+    }
+
+    computeGainlose(matchData,team){
+        switch(team){
+            case 'team1':
+                this.gain+=matchData.score.ft[0]
+                this.lose+=matchData.score.ft[1]
+                break;
+            case 'team2':
+                this.gain+=matchData.score.ft[1]
+                this.lose+=matchData.score.ft[0]
+                break;
+            default:
+                break;
+        }
+    }
+
+    setScoreResult(result){
+        switch(result){
+            case 'win':
+                this.w+=1
+                this.score+=3
+                this.setRecords('win')
+                break;
+            case 'draw':
+                this.d+=1
+                this.score+=1
+                this.setRecords('draw')
+                break;
+            case 'lose':
+                this.l+=1
+                this.setRecords('lose')
+                break;
+            default:
+                break;
+        }
+    }
+
+    setRecords(result){
+        if(this.records.length<5){
+            this.records[this.records.length]=result
+        }
+        return
+    }
 }
